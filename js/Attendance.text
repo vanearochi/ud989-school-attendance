@@ -1,0 +1,9 @@
+Attendance.text
+
++ Create each tr and content with JS function
++ Array of names
++ We have An Object with names and and array of checked properties created by the first function on the page which we should't modify
++ We need 3 parts (MCV)
++ Function that checks if the property Checked is true or false and checked the ones with true and add counter if false return counter and call a function for checking boxes every true
++
+
