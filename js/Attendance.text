@@ -7,3 +7,5 @@ Attendance.text
 + Function that checks if the property Checked is true or false and checked the ones with true and add counter if false return counter and call a function for checking boxes every true
 +
 
+
+
