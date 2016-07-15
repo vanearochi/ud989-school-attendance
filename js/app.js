@@ -40,6 +40,10 @@ var model = {
 
 var controller = {
 
+    init: function(){
+        view.createTable()
+    },
+
     getNameList: function(){
 
         var nameList = [];
@@ -161,7 +165,20 @@ var view = {
         controller.setAttr(tdLastCell, "class", "missed-col");
         tdLastCell.innerHTML = 0;
         bodyRow.appendChild(tdLastCell);
+    },
+
+    createTable: function(){
+
+        view.addTHeaderRowtoHtml()
+
+        var studentList = controller.getNameList();
+
+        for(var i = 0; i < studentList.length; i++){
+            console.log(i);
+            view.addTBodyRowstoHtml(studentList[i]);
+        }
     }
+
 
 
 
@@ -169,8 +186,9 @@ var view = {
 
 }
 
-view.addTHeaderRowtoHtml()
-view.addTBodyRowstoHtml("bla")
+controller.init();
+//view.createTable();
+//view.addTBodyRowstoHtml("bla")
 });
 
 /* STUDENT APPLICATION */
