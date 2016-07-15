@@ -60,28 +60,22 @@ var controller = {
             return howManyDays
     },
 
-    makeHtmlElem: function(elemName, className, idName){
+    makeHtmlElem: function(elemName){
 
         var htmlElem = document.createElement(elemName);
 
-        if(className === 0){
-
-            htmlElem.id = idName;
             return htmlElem;
-        }
-        else if(idName === 0){
-
-            htmlElem.class = className;
-            return htmlElem
-        }
-        else{
-
-            htmlElem.class = className;
-            htmlElem.id = idName;
-            return htmlElem
-        }
 
     },
+
+    setAttr: function(element, attrName, value){
+
+       var elemWithAttr = element.setAttribute(attrName, value);
+
+       return elemWithAttr;
+
+    },
+
 
     contructRowsElem: function(classNAme, idName, headerORinput){
 
@@ -103,16 +97,17 @@ var controller = {
 var view = {
 
     bla : function(){
-        console.log(controller.makeHtmlElem("p", "b", "b"))
+        console.log(controller.makeHtmlElem("p"))
         controller.contructRowsElem()
     },
 
-    addHeaderRowtoHtml: function(){
+    addTHeaderRowtoHtml: function(){
 
         var theadElem = $("thead");
-        var headerRow = controller.makeHtmlElem("tr", 0 , 0);
-        theadElem.append(headerRow)
-        var thFirstCell = controller.makeHtmlElem("th", "name-col", 0);
+        var headerRow = controller.makeHtmlElem("tr");
+        theadElem.append(headerRow);
+        var thFirstCell = controller.makeHtmlElem("th");
+        controller.setAttr(headerRow, "class", "name-col")
         thFirstCell.innerHTML = "Student Name"
         headerRow.appendChild(thFirstCell);
         var howManyDays = controller.numberOfDays();
@@ -121,24 +116,61 @@ var view = {
 
         for(var i = 0; i < howManyDays; i++){
 
-            thCell = controller.makeHtmlElem("th", 0, 0);
-            thCell.innerHTML = i;
+            thCell = controller.makeHtmlElem("th");
+            thCell.innerHTML = i + 1;
             headerRow.appendChild(thCell);
-            console.log(i)
+            //console.log(i)
 
         }
 
         var thLastCell = controller.makeHtmlElem("th","missed-col", 0);
+        controller.setAttr(thLastCell, "class", "missed-col")
         thLastCell.innerHTML = "Days Missed-col";
         headerRow.appendChild(thLastCell);
+    },
+
+    addTBodyRowstoHtml: function(studentName){
+
+        var tbodyElem = $("tbody");
+        var bodyRow = controller.makeHtmlElem("tr");
+        controller.setAttr(bodyRow, "class", "student");
+        tbodyElem.append(bodyRow);
+        var tdFirstCell = controller.makeHtmlElem("td");
+        controller.setAttr(tdFirstCell, "class", "name-col");
+        tdFirstCell.innerHTML = studentName;
+        bodyRow.appendChild(tdFirstCell);
+        var howManyDays = controller.numberOfDays();
+        console.log(howManyDays)
+        var tdCell;
+        var inputElem;
+
+        for(var i = 0; i < howManyDays; i++){
+
+            console.log(i)
+            tdCell = controller.makeHtmlElem("td");
+            controller.setAttr(tdCell, "class", "attend-col");
+            inputElem = controller.makeHtmlElem("input");
+            controller.setAttr(inputElem, "type", "checkbox");
+            bodyRow.appendChild(tdCell);
+            tdCell.appendChild(inputElem);
+
+
+        }
+
+        var tdLastCell = controller.makeHtmlElem("td");
+        controller.setAttr(tdLastCell, "class", "missed-col");
+        tdLastCell.innerHTML = 0;
+        bodyRow.appendChild(tdLastCell);
     }
+
 
 
 
 
 }
 
-view.addHeaderRowtoHtml()
+view.addTHeaderRowtoHtml()
+view.addTBodyRowstoHtml("bla")
 });
 
 /* STUDENT APPLICATION */
