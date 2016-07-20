@@ -27,14 +27,14 @@
 
 }());
 
-//console.log(localStorage.attendance)
 
 $(document).ready(function(){
 
 var model = {
 
-    attendanceRecord : JSON.parse(localStorage.attendance)
+    attendanceRecord : JSON.parse(localStorage.attendance),
 
+    daysAttended : {}
 
 };
 
@@ -42,6 +42,15 @@ var controller = {
 
     init: function(){
         view.createTable()
+        console.log(model.attendanceRecord)
+    },
+
+    getAttendanceRecord: function(){
+
+        var attendanceList = model.attendanceRecord;
+
+        return attendanceList;
+
     },
 
     getNameList: function(){
@@ -64,54 +73,72 @@ var controller = {
             return howManyDays
     },
 
-    makeHtmlElem: function(elemName){
 
-        var htmlElem = document.createElement(elemName);
+    getAttendanceDayInfo: function(studentName, day){
 
-            return htmlElem;
+        var completeAttendanceList = controller.getAttendanceRecord();
+        var studentAttendanceRecord = completeAttendanceList[studentName];
+        var attendanceDayInfo = studentAttendanceRecord[day];
+        console.log(attendanceDayInfo);
+
+        return attendanceDayInfo;
+    },
+
+    addEventListenerToCheckbox: function(){
+
+        $("input").unbind().click(function(){
+
+            var clickedElem = $(this);
+            var studentName = clickedElem.attr("class");
+            var daysAttended = model.daysAttended[studentName];
+
+            if(clickedElem.attr("checked") === undefined){
+
+                clickedElem.attr("checked", true);
+                model.daysAttended[studentName] = daysAttended + 1;
+                console.log(model.daysAttended[studentName])
+                view.changeDaysMissedVal(model.daysAttended[studentName], studentName)
+
+            }
+            else{
+
+                clickedElem.removeAttr("checked")
+                model.daysAttended[studentName] = daysAttended - 1;
+                console.log(model.daysAttended[studentName]);
+                view.changeDaysMissedVal(model.daysAttended[studentName], studentName)
+            }
+
+        })
+    },
+
+    fillAttendedDays: function(studentName,days){
+
+        model.daysAttended[studentName]= days;
+        console.log(model.daysAttended)
 
     },
 
-    setAttr: function(element, attrName, value){
+    changeAttendedDays: function(className, value){
+        console.log(value);
 
-       var elemWithAttr = element.setAttribute(attrName, value);
-
-       return elemWithAttr;
-
-    },
-
-
-    contructRowsElem: function(classNAme, idName, headerORinput){
-
-        var howManyDays = controller.numberOfDays();
-
-
-
-
-                controller.makeHtmlElem("th")
-
-
-        console.log(howManyDays)
+        var daysAttended = model.daysAttended[className] + value;
+        console.log(daysAttended);
     }
 
-}
-//model.bla
 
-//console.log(model.nameList)
+
+}
+
 var view = {
 
-    bla : function(){
-        console.log(controller.makeHtmlElem("p"))
-        controller.contructRowsElem()
-    },
 
     addTHeaderRowtoHtml: function(){
 
         var theadElem = $("thead");
-        var headerRow = controller.makeHtmlElem("tr");
+        var headerRow = document.createElement("tr");
         theadElem.append(headerRow);
-        var thFirstCell = controller.makeHtmlElem("th");
-        controller.setAttr(headerRow, "class", "name-col")
+        var thFirstCell = document.createElement("th");
+        headerRow.setAttribute( "class", "name-col")
         thFirstCell.innerHTML = "Student Name"
         headerRow.appendChild(thFirstCell);
         var howManyDays = controller.numberOfDays();
@@ -120,15 +147,14 @@ var view = {
 
         for(var i = 0; i < howManyDays; i++){
 
-            thCell = controller.makeHtmlElem("th");
+            thCell = document.createElement("th");
             thCell.innerHTML = i + 1;
             headerRow.appendChild(thCell);
-            //console.log(i)
 
         }
 
-        var thLastCell = controller.makeHtmlElem("th","missed-col", 0);
-        controller.setAttr(thLastCell, "class", "missed-col")
+        var thLastCell = document.createElement("th");
+        thLastCell.setAttribute( "class", "missed-col")
         thLastCell.innerHTML = "Days Missed-col";
         headerRow.appendChild(thLastCell);
     },
@@ -136,34 +162,52 @@ var view = {
     addTBodyRowstoHtml: function(studentName){
 
         var tbodyElem = $("tbody");
-        var bodyRow = controller.makeHtmlElem("tr");
-        controller.setAttr(bodyRow, "class", "student");
+        var bodyRow = document.createElement("tr");
+        bodyRow.setAttribute("class", "student");
         tbodyElem.append(bodyRow);
-        var tdFirstCell = controller.makeHtmlElem("td");
-        controller.setAttr(tdFirstCell, "class", "name-col");
+        var tdFirstCell = document.createElement("td");
+        tdFirstCell.setAttribute("class", "name-col");
         tdFirstCell.innerHTML = studentName;
         bodyRow.appendChild(tdFirstCell);
         var howManyDays = controller.numberOfDays();
         console.log(howManyDays)
-        var tdCell;
-        var inputElem;
+        var tdCell,
+            inputElem,
+            attendanceDayInfo,
+            falseCounter = howManyDays;
+
 
         for(var i = 0; i < howManyDays; i++){
 
             console.log(i)
-            tdCell = controller.makeHtmlElem("td");
-            controller.setAttr(tdCell, "class", "attend-col");
-            inputElem = controller.makeHtmlElem("input");
-            controller.setAttr(inputElem, "type", "checkbox");
+            tdCell = document.createElement("td");
+            tdCell.setAttribute("class", "attend-col");
+            inputElem = document.createElement("input");
+            inputElem.setAttribute("type", "checkbox");
+            inputElem.setAttribute("class", studentName)
+            attendanceDayInfo = controller.getAttendanceDayInfo(studentName, i);
+
+            if(attendanceDayInfo === true){
+
+                inputElem.setAttribute("checked", true);
+                falseCounter -= 1;
+            }
+
+
             bodyRow.appendChild(tdCell);
             tdCell.appendChild(inputElem);
+            controller.addEventListenerToCheckbox();
 
 
         }
 
-        var tdLastCell = controller.makeHtmlElem("td");
-        controller.setAttr(tdLastCell, "class", "missed-col");
-        tdLastCell.innerHTML = 0;
+        var studentDaysAttended = 12 - falseCounter;
+        controller.fillAttendedDays(studentName, studentDaysAttended);
+        var tdLastCell = document.createElement("td");
+        tdLastCell.setAttribute("class", "missed-col");
+
+        tdLastCell.setAttribute("id", studentName);
+        tdLastCell.innerHTML = falseCounter;
         bodyRow.appendChild(tdLastCell);
     },
 
@@ -177,87 +221,20 @@ var view = {
             console.log(i);
             view.addTBodyRowstoHtml(studentList[i]);
         }
+    },
+
+
+    changeDaysMissedVal: function(daysAttended, studentName){
+
+        var tableMissedValue = document.getElementById(studentName);
+        tableMissedValue.innerHTML = 12-daysAttended;
+        console.log(tableMissedValue)
+
     }
-
-
-
-
-
 
 }
 
 controller.init();
-//view.createTable();
-//view.addTBodyRowstoHtml("bla")
+
 });
 
-/* STUDENT APPLICATION */
-// $(function() {
-//     //console.log(localStorage)
-//     var attendance = JSON.parse(localStorage.attendance),
-//         $allMissed = $('tbody .missed-col'),
-//         $allCheckboxes = $('tbody input');
-//     //console.log(attendance)
-//     //console.log($allMissed)
-//     //console.log($allCheckboxes
-
-
-//     // Count a student's missed days
-//     function countMissing() {
-//         $allMissed.each(function() {
-//             var studentRow = $(this).parent('tr'),
-
-//                 dayChecks = $(studentRow).children('td').children('input'),
-
-//                 numMissed = 0;
-//                 //console.log(studentRow)
-//                 //console.log(dayChecks)
-
-//             dayChecks.each(function() {
-//                 if (!$(this).prop('checked')) {
-//                     numMissed++;
-//                 }
-//             });
-//             //console.log($(this))
-//             $(this).text(numMissed);
-//         });
-//     }
-
-//     // Check boxes, based on attendace records
-//     $.each(attendance, function(name, days) {
-//          console.log(attendance);
-//         // console.log(name);
-//         // console.log(days);
-//         var studentRow = $('tbody .name-col:contains("' + name + '")').parent('tr'),
-//             dayChecks = $(studentRow).children('.attend-col').children('input');
-//             //console.log(studentRow);
-//             //console.log(dayChecks);
-
-//         dayChecks.each(function(i) {
-//             $(this).prop('checked', days[i]);
-//             console.log( $(this).prop('checked', days[i]))
-//         });
-//     });
-
-//     // When a checkbox is clicked, update localStorage
-//     $allCheckboxes.on('click', function() {
-//         var studentRows = $('tbody .student'),
-//             newAttendance = {};
-
-//         studentRows.each(function() {
-//             var name = $(this).children('.name-col').text(),
-//                 $allCheckboxes = $(this).children('td').children('input');
-//                 console.log(name)
-//             newAttendance[name] = [];
-
-//             $allCheckboxes.each(function() {
-//                 newAttendance[name].push($(this).prop('checked'));
-//             });
-//         });
-
-//         countMissing();
-//         localStorage.attendance = JSON.stringify(newAttendance);
-//     });
-
-//     countMissing();
-// }());
